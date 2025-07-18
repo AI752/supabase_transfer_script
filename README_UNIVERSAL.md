@@ -6,7 +6,7 @@ A single, cross-platform script that automatically checks for required tools and
 
 1. **Download the script**:
    ```bash
-   wget https://raw.githubusercontent.com/your-repo/supabase_db_copy_universal.sh
+   wget https://raw.githubusercontent.com/AI752/supabase_transfer_script/supabase_db_copy_universal.sh
    chmod +x supabase_db_copy_universal.sh
    ```
 
