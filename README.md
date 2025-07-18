@@ -7,7 +7,8 @@ This repository contains scripts to automate the process of copying a Supabase d
 - **`supabase_db_copy.sh`** - Ubuntu/Linux bash script (also works on macOS)
 - **`supabase_db_copy_mac.sh`** - macOS-specific script
 - **`supabase_db_copy.ps1`** - Windows PowerShell script (recommended for Windows)
-- **`supabase_db_copy.bat`** - Windows batch script
+- **`supabase_db_copy_simple.bat`** - Windows batch script (simplified, more reliable)
+- **`supabase_db_copy.bat`** - Windows batch script (advanced version)
 
 ## Features
 
@@ -173,7 +174,19 @@ You can also provide the database URLs as command line arguments:
 - `-KeepFiles`: Keep temporary files after completion
 - `-Help`: Show help message
 
-#### Batch Script
+#### Batch Script (Simplified - Recommended)
+
+**Interactive Mode**:
+```cmd
+supabase_db_copy_simple.bat
+```
+
+**Help**:
+```cmd
+supabase_db_copy_simple.bat --help
+```
+
+#### Batch Script (Advanced)
 
 **Interactive Mode**:
 ```cmd
@@ -288,6 +301,30 @@ chmod +x supabase_db_copy.sh
 - `[ERROR] Failed to dump roles/schema/data`: Check your source database connection
 - `[ERROR] Failed to upload database`: Check your destination database connection
 - `[ERROR] Failed to install postgresql`: Run the PostgreSQL fix script (Windows only)
+
+### PowerShell Execution Policy Issues
+
+If you get "running scripts is disabled" error:
+
+1. **Quick fix (recommended)**:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+2. **Or use the fix script**:
+   ```powershell
+   .\fix_powershell_execution.ps1
+   ```
+
+3. **Or bypass for current session**:
+   ```powershell
+   .\run_powershell_script.ps1
+   ```
+
+4. **Alternative: Use batch script instead**:
+   ```cmd
+   .\supabase_db_copy_simple.bat
+   ```
 
 ### Windows PostgreSQL Issues
 
