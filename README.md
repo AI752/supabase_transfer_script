@@ -4,6 +4,12 @@ This repository contains scripts to automate the process of copying a Supabase d
 
 ## Available Scripts
 
+### Universal Scripts (Recommended)
+- **`supabase_db_copy_universal.sh`** - Linux (Ubuntu/CentOS/Fedora) - Checks and installs required tools
+- **`supabase_db_copy_universal_mac.sh`** - macOS - Checks and installs required tools
+- **`supabase_db_copy_universal.ps1`** - Windows PowerShell - Checks and installs required tools
+
+### Legacy Scripts
 - **`supabase_db_copy.sh`** - Ubuntu/Linux bash script (also works on macOS)
 - **`supabase_db_copy_mac.sh`** - macOS-specific script
 - **`supabase_db_copy.ps1`** - Windows PowerShell script (recommended for Windows)
@@ -21,149 +27,261 @@ This repository contains scripts to automate the process of copying a Supabase d
 
 ## Prerequisites
 
-### For Ubuntu/Linux
-- Ubuntu/Linux system
-- Internet connection
-- Docker Desktop (will be installed if not present)
-- Supabase account with access to source and destination projects
+### System Requirements
 
-### For macOS
-- macOS 10.15 (Catalina) or later
-- Internet connection
-- Docker Desktop (will be installed if not present)
-- Supabase account with access to source and destination projects
+#### For Linux (Ubuntu/CentOS/Fedora)
+- **Operating System**: Ubuntu 18.04+, CentOS 7+, RHEL 7+, or Fedora 28+
+- **Architecture**: x86_64 (64-bit)
+- **Memory**: Minimum 2GB RAM (4GB recommended)
+- **Storage**: At least 1GB free space for temporary files
+- **Network**: Stable internet connection
+- **Permissions**: Sudo access for package installation
 
-### For Windows
-- Windows 10 or later
-- PowerShell 5.1 or later (for PowerShell script)
-- Internet connection
-- Docker Desktop (will be installed if not present)
-- Supabase account with access to source and destination projects
+#### For macOS
+- **Operating System**: macOS 10.15 (Catalina) or later
+- **Architecture**: Intel or Apple Silicon (M1/M2)
+- **Memory**: Minimum 2GB RAM (4GB recommended)
+- **Storage**: At least 1GB free space for temporary files
+- **Network**: Stable internet connection
+- **Permissions**: Administrator access for Homebrew installation
+
+#### For Windows
+- **Operating System**: Windows 10 or later
+- **Architecture**: x64 (64-bit)
+- **Memory**: Minimum 2GB RAM (4GB recommended)
+- **Storage**: At least 1GB free space for temporary files
+- **Network**: Stable internet connection
+- **PowerShell**: Version 5.1 or later
+- **Permissions**: Administrator access for Chocolatey installation
+
+### Required Tools
+
+The scripts will automatically check for and install these tools:
+
+#### Core Tools
+- **curl**: For downloading files and API requests
+- **wget**: Alternative download tool
+- **PostgreSQL Client**: For database operations (`psql` command)
+- **Docker**: For Supabase CLI operations
+- **Supabase CLI**: For database dumping and management
+
+#### Platform-Specific Package Managers
+- **Linux**: `apt-get` (Ubuntu/Debian), `yum`/`dnf` (CentOS/RHEL/Fedora)
+- **macOS**: Homebrew
+- **Windows**: Chocolatey
+
+### Account Requirements
+
+#### Supabase Account
+- **Access**: Valid Supabase account with access to source and destination projects
+- **Permissions**: Database access permissions for both projects
+- **API Keys**: Not required (uses Supabase CLI authentication)
+
+#### Database Access
+- **Source Database**: Read access to all tables, schemas, and roles
+- **Destination Database**: Write access to create tables, schemas, and roles
+- **Network**: IP whitelist access to both databases
+- **Credentials**: Valid database passwords for both projects
+
+### Network Requirements
+
+#### Internet Connectivity
+- **Download Speed**: Minimum 1 Mbps for tool installation
+- **Upload Speed**: Minimum 5 Mbps for database operations
+- **Stability**: Reliable connection for large database transfers
+
+#### Firewall/Proxy
+- **Outbound**: Access to GitHub (for Supabase CLI), Docker Hub, and Supabase APIs
+- **Inbound**: No special requirements
+- **Corporate Networks**: May need proxy configuration for tool downloads
+
+### Security Considerations
+
+#### Authentication
+- **Supabase CLI**: Will prompt for login during first run
+- **Database URLs**: Contain sensitive credentials - keep secure
+- **Temporary Files**: Automatically cleaned up unless `--keep` flag is used
+
+#### Permissions
+- **File System**: Read/write access to current directory
+- **Network**: Outbound connections to database servers
+- **System**: Package manager installation permissions
+
+### Performance Requirements
+
+#### Database Size Considerations
+- **Small Databases** (< 100MB): Should complete in 5-10 minutes
+- **Medium Databases** (100MB - 1GB): Should complete in 10-30 minutes
+- **Large Databases** (> 1GB): May take 30+ minutes, consider using `--keep` flag
+
+#### Resource Usage
+- **CPU**: Moderate usage during dump/upload operations
+- **Memory**: Scales with database size, 2-4GB recommended
+- **Disk**: Temporary storage equal to database size
+- **Network**: Bandwidth usage proportional to database size
 
 ## Installation
 
-### For Ubuntu/Linux
+### Universal Scripts (Recommended)
 
-1. **Download the script**:
-   ```bash
-   wget https://raw.githubusercontent.com/your-repo/supabase_db_copy.sh
-   ```
+#### For Linux (Ubuntu/CentOS/Fedora)
+```bash
+# Download the universal Linux script
+wget https://raw.githubusercontent.com/your-repo/supabase_db_copy_universal.sh
+chmod +x supabase_db_copy_universal.sh
+```
 
-2. **Make it executable**:
-   ```bash
-   chmod +x supabase_db_copy.sh
-   ```
+#### For macOS
+```bash
+# Download the universal macOS script
+curl -o supabase_db_copy_universal_mac.sh https://raw.githubusercontent.com/your-repo/supabase_db_copy_universal_mac.sh
+chmod +x supabase_db_copy_universal_mac.sh
+```
 
-### For macOS
+#### For Windows
+```powershell
+# Download the universal Windows PowerShell script
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/your-repo/supabase_db_copy_universal.ps1" -OutFile "supabase_db_copy_universal.ps1"
+```
 
-1. **Download the Mac-specific script** (recommended):
-   ```bash
-   curl -o supabase_db_copy_mac.sh https://raw.githubusercontent.com/your-repo/supabase_db_copy_mac.sh
-   chmod +x supabase_db_copy_mac.sh
-   ```
+### Legacy Scripts
 
-2. **Or use the Linux script** (also works on macOS):
-   ```bash
-   curl -o supabase_db_copy.sh https://raw.githubusercontent.com/your-repo/supabase_db_copy.sh
-   chmod +x supabase_db_copy.sh
-   ```
+#### For Ubuntu/Linux
+```bash
+# Download the legacy Linux script
+wget https://raw.githubusercontent.com/your-repo/supabase_db_copy.sh
+chmod +x supabase_db_copy.sh
+```
 
-### For Windows
+#### For macOS
+```bash
+# Download the legacy Mac-specific script
+curl -o supabase_db_copy_mac.sh https://raw.githubusercontent.com/your-repo/supabase_db_copy_mac.sh
+chmod +x supabase_db_copy_mac.sh
+```
 
-1. **Download the PowerShell script** (recommended):
-   ```powershell
-   # Download the PowerShell script
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/your-repo/supabase_db_copy.ps1" -OutFile "supabase_db_copy.ps1"
-   ```
-
-2. **Or download the batch script**:
-   ```cmd
-   # Download the batch script
-   curl -o supabase_db_copy.bat https://raw.githubusercontent.com/your-repo/supabase_db_copy.bat
-   ```
+#### For Windows
+```powershell
+# Download the legacy PowerShell script
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/your-repo/supabase_db_copy.ps1" -OutFile "supabase_db_copy.ps1"
+```
 
 ## Usage
 
-### For Ubuntu/Linux
+### Universal Scripts (Recommended)
 
-#### Interactive Mode (Default)
+#### For Linux (Ubuntu/CentOS/Fedora)
 
-Run the script and it will prompt you for the database URLs:
+**Interactive Mode (Default)**:
+```bash
+./supabase_db_copy_universal.sh
+```
 
+**Command Line Mode (Advanced)**:
+```bash
+./supabase_db_copy_universal.sh -s "postgresql://user:pass@host:port/db" -t "postgresql://user:pass@host:port/db"
+```
+
+**Skip Docker Check (for headless servers)**:
+```bash
+./supabase_db_copy_universal.sh --no-docker
+```
+
+**Keep Temporary Files**:
+```bash
+./supabase_db_copy_universal.sh -k
+```
+
+#### For macOS
+
+**Interactive Mode (Default)**:
+```bash
+./supabase_db_copy_universal_mac.sh
+```
+
+**Command Line Mode (Advanced)**:
+```bash
+./supabase_db_copy_universal_mac.sh -s "postgresql://user:pass@host:port/db" -t "postgresql://user:pass@host:port/db"
+```
+
+**Skip Docker Check**:
+```bash
+./supabase_db_copy_universal_mac.sh --no-docker
+```
+
+**Keep Temporary Files**:
+```bash
+./supabase_db_copy_universal_mac.sh -k
+```
+
+#### For Windows
+
+**Interactive Mode (Default)**:
+```powershell
+.\supabase_db_copy_universal.ps1
+```
+
+**Command Line Mode (Advanced)**:
+```powershell
+.\supabase_db_copy_universal.ps1 -SourceUrl "postgresql://user:pass@host:port/db" -TargetUrl "postgresql://user:pass@host:port/db"
+```
+
+**Skip Docker Check**:
+```powershell
+.\supabase_db_copy_universal.ps1 -NoDocker
+```
+
+**Keep Temporary Files**:
+```powershell
+.\supabase_db_copy_universal.ps1 -KeepFiles
+```
+
+### Legacy Scripts
+
+#### For Ubuntu/Linux
+
+**Interactive Mode (Default)**:
 ```bash
 ./supabase_db_copy.sh
 ```
 
-The script will:
-1. Install required dependencies
-2. Prompt you for source database URL
-3. Prompt you for destination database URL
-4. Show a summary and ask for confirmation
-5. Perform the database copy operation
-
-#### Command Line Mode (Advanced)
-
-You can also provide the database URLs as command line arguments:
-
+**Command Line Mode (Advanced)**:
 ```bash
 ./supabase_db_copy.sh -s "postgresql://user:pass@host:port/db" -t "postgresql://user:pass@host:port/db"
 ```
 
-#### Options
-
+**Options**:
 - `-h, --help`: Show help message
 - `-s, --source`: Source database URL (for advanced users)
 - `-t, --target`: Target database URL (for advanced users)
 - `-k, --keep`: Keep temporary files after completion
 
-### For macOS
+#### For macOS
 
-#### Interactive Mode (Default)
-
-Run the Mac-specific script and it will prompt you for the database URLs:
-
+**Interactive Mode (Default)**:
 ```bash
 ./supabase_db_copy_mac.sh
 ```
 
-Or use the Linux script (also works on macOS):
-
-```bash
-./supabase_db_copy.sh
-```
-
-The script will:
-1. Install required dependencies (Homebrew, PostgreSQL, etc.)
-2. Prompt you for source database URL
-3. Prompt you for destination database URL
-4. Show a summary and ask for confirmation
-5. Perform the database copy operation
-
-#### Command Line Mode (Advanced)
-
-You can also provide the database URLs as command line arguments:
-
+**Command Line Mode (Advanced)**:
 ```bash
 ./supabase_db_copy_mac.sh -s "postgresql://user:pass@host:port/db" -t "postgresql://user:pass@host:port/db"
 ```
 
-#### Options
-
+**Options**:
 - `-h, --help`: Show help message
 - `-s, --source`: Source database URL (for advanced users)
 - `-t, --target`: Target database URL (for advanced users)
 - `-k, --keep`: Keep temporary files after completion
 
-### For Windows
+#### For Windows
 
-#### PowerShell Script (Recommended)
-
-**Interactive Mode**:
+**PowerShell Script (Recommended)**:
 ```powershell
 .\supabase_db_copy.ps1
 ```
 
-**Command Line Mode** (Advanced):
+**Command Line Mode (Advanced)**:
 ```powershell
 .\supabase_db_copy.ps1 -SourceUrl "postgresql://user:pass@host:port/db" -TargetUrl "postgresql://user:pass@host:port/db"
 ```
@@ -174,35 +292,15 @@ You can also provide the database URLs as command line arguments:
 - `-KeepFiles`: Keep temporary files after completion
 - `-Help`: Show help message
 
-#### Batch Script (Simplified - Recommended)
-
-**Interactive Mode**:
+**Batch Script (Simplified)**:
 ```cmd
 supabase_db_copy_simple.bat
 ```
 
-**Help**:
-```cmd
-supabase_db_copy_simple.bat --help
-```
-
-#### Batch Script (Advanced)
-
-**Interactive Mode**:
-```cmd
-supabase_db_copy.bat
-```
-
-**Command Line Mode** (Advanced):
+**Batch Script (Advanced)**:
 ```cmd
 supabase_db_copy.bat -s "postgresql://user:pass@host:port/db" -t "postgresql://user:pass@host:port/db"
 ```
-
-**Options**:
-- `-h, --help`: Show help message
-- `-s, --source`: Source database URL (for advanced users)
-- `-t, --target`: Target database URL (for advanced users)
-- `-k, --keep`: Keep temporary files after completion
 
 ## Getting Database URLs
 
@@ -219,9 +317,30 @@ supabase_db_copy.bat -s "postgresql://user:pass@host:port/db" -t "postgresql://u
 postgresql://postgres:your_password@db.abcdefghijklmnop.supabase.co:5432/postgres
 ```
 
-## What the Script Does
+## What the Scripts Do
 
-### For Ubuntu/Linux
+### Universal Scripts (Recommended)
+
+All universal scripts perform the same core operations:
+
+1. **OS Detection**: Automatically detects your operating system
+2. **Tool Checking**: Checks for all required tools (curl, wget, PostgreSQL, Docker, Supabase CLI)
+3. **Installation Prompts**: Asks before installing any missing tools
+4. **Package Management**: Uses appropriate package managers for each OS
+   - **Linux**: `apt-get` (Ubuntu/Debian), `yum`/`dnf` (CentOS/RHEL/Fedora)
+   - **macOS**: Homebrew (installs if missing)
+   - **Windows**: Chocolatey (installs if missing)
+5. **Database Operations**:
+   - Tests database connections
+   - Dumps database roles (`roles.sql`)
+   - Dumps database schema (`schema.sql`) 
+   - Dumps database data (`data.sql`)
+   - Uploads all data to destination database
+6. **Cleanup**: Removes temporary files (unless `--keep` flag is used)
+
+### Legacy Scripts
+
+#### For Ubuntu/Linux
 1. **System Check**: Verifies Ubuntu/Linux environment
 2. **Dependency Installation**: 
    - Updates package list
@@ -230,14 +349,10 @@ postgresql://postgres:your_password@db.abcdefghijklmnop.supabase.co:5432/postgre
    - Installs Supabase CLI if not present
 3. **Docker Check**: Ensures Docker is running
 4. **Supabase Login**: Handles Supabase CLI authentication
-5. **Database Operations**:
-   - Dumps database roles (`roles.sql`)
-   - Dumps database schema (`schema.sql`) 
-   - Dumps database data (`data.sql`)
-   - Uploads all data to destination database
+5. **Database Operations**: Same as universal scripts
 6. **Cleanup**: Removes temporary files
 
-### For macOS
+#### For macOS
 1. **System Check**: Verifies macOS environment
 2. **Dependency Installation**: 
    - Installs Homebrew if not present
@@ -245,14 +360,10 @@ postgresql://postgres:your_password@db.abcdefghijklmnop.supabase.co:5432/postgre
    - Installs Supabase CLI if not present
 3. **Docker Check**: Ensures Docker is running
 4. **Supabase Login**: Handles Supabase CLI authentication
-5. **Database Operations**:
-   - Dumps database roles (`roles.sql`)
-   - Dumps database schema (`schema.sql`) 
-   - Dumps database data (`data.sql`)
-   - Uploads all data to destination database
+5. **Database Operations**: Same as universal scripts
 6. **Cleanup**: Removes temporary files
 
-### For Windows
+#### For Windows
 1. **System Check**: Verifies Windows environment
 2. **Dependency Installation**: 
    - Installs Chocolatey if not present
@@ -260,11 +371,7 @@ postgresql://postgres:your_password@db.abcdefghijklmnop.supabase.co:5432/postgre
    - Installs Supabase CLI if not present
 3. **Docker Check**: Ensures Docker is running
 4. **Supabase Login**: Handles Supabase CLI authentication
-5. **Database Operations**:
-   - Dumps database roles (`roles.sql`)
-   - Dumps database schema (`schema.sql`) 
-   - Dumps database data (`data.sql`)
-   - Uploads all data to destination database
+5. **Database Operations**: Same as universal scripts
 6. **Cleanup**: Removes temporary files
 
 ## Troubleshooting
