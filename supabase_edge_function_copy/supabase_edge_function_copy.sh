@@ -38,7 +38,14 @@ mkdir "$WORKDIR"
 cd "$WORKDIR"
 
 print_status "Listing functions in source project..."
-FUNCTIONS=$(supabase functions list --project-ref "$SOURCE_PROJECT" | awk 'NR>1 {print $1}')
+
+# Get the function list and parse it properly
+FUNCTION_OUTPUT=$(supabase functions list --project-ref "$SOURCE_PROJECT")
+echo "$FUNCTION_OUTPUT"
+
+# Extract function names from the NAME column (3rd column after the |)
+# Skip header and separator lines, extract names from table format
+FUNCTIONS=$(echo "$FUNCTION_OUTPUT" | grep -E '^\s*[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}' | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}' | grep -v "^$")
 
 if [ -z "$FUNCTIONS" ]; then
   print_error "No functions found in source project."
@@ -47,13 +54,31 @@ if [ -z "$FUNCTIONS" ]; then
   exit 1
 fi
 
-print_status "Functions to copy: $FUNCTIONS"
+print_status "Functions to copy:"
+echo "$FUNCTIONS"
 
 for FUNC in $FUNCTIONS; do
+  if [ -z "$FUNC" ] || [ "$FUNC" = "ID" ]; then
+    print_error "Skipping invalid function identifier: '$FUNC'"
+    continue
+  fi
+  
   print_status "Downloading function: $FUNC"
-  supabase functions download "$FUNC" --project-ref "$SOURCE_PROJECT"
+  if ! supabase functions download "$FUNC" --project-ref "$SOURCE_PROJECT"; then
+    print_error "Failed to download function: $FUNC"
+    print_status "Trying with --debug flag..."
+    supabase functions download "$FUNC" --project-ref "$SOURCE_PROJECT" --debug
+    continue
+  fi
+  
   print_status "Deploying function: $FUNC to target project"
-  supabase functions deploy "$FUNC" --project-ref "$TARGET_PROJECT"
+  if ! supabase functions deploy "$FUNC" --project-ref "$TARGET_PROJECT"; then
+    print_error "Failed to deploy function: $FUNC"
+    print_status "Trying with --debug flag..."
+    supabase functions deploy "$FUNC" --project-ref "$TARGET_PROJECT" --debug
+    continue
+  fi
+  
   print_success "Function $FUNC copied successfully."
 done
 
