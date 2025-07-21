@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-# Supabase Edge Function Copy Script
-# Copies all Edge Functions from one Supabase project to another
+# Supabase Edge Function Download Script
+# Downloads all Edge Functions from a specified Supabase project
 # Requirements: Supabase CLI installed and logged in
 
 set -e
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -22,18 +21,14 @@ function print_error() {
   echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
-# Check for supabase CLI
 if ! command -v supabase &> /dev/null; then
   print_error "Supabase CLI not found. Please install it first."
   exit 1
 fi
 
-# Prompt for source and target project IDs
 read -p "Enter SOURCE Supabase project ref (e.g. abcdefghijklmnop): " SOURCE_PROJECT
-read -p "Enter TARGET Supabase project ref (e.g. zyxwvutsrqponmlk): " TARGET_PROJECT
 
-# Create a temp directory for function code
-WORKDIR="edge_functions_tmp_$(date +%s)"
+WORKDIR="downloaded_edge_functions_${SOURCE_PROJECT}_$(date +%s)"
 mkdir "$WORKDIR"
 cd "$WORKDIR"
 
@@ -54,8 +49,7 @@ if [ -z "$FUNCTIONS" ]; then
   exit 1
 fi
 
-print_status "Functions to copy:"
-echo "$FUNCTIONS"
+print_status "Functions to download: $FUNCTIONS"
 
 for FUNC in $FUNCTIONS; do
   if [ -z "$FUNC" ] || [ "$FUNC" = "ID" ]; then
@@ -64,24 +58,9 @@ for FUNC in $FUNCTIONS; do
   fi
   
   print_status "Downloading function: $FUNC"
-  if ! supabase functions download "$FUNC" --project-ref "$SOURCE_PROJECT"; then
-    print_error "Failed to download function: $FUNC"
-    print_status "Trying with --debug flag..."
-    supabase functions download "$FUNC" --project-ref "$SOURCE_PROJECT" --debug
-    continue
-  fi
-  
-  print_status "Deploying function: $FUNC to target project"
-  if ! supabase functions deploy "$FUNC" --project-ref "$TARGET_PROJECT"; then
-    print_error "Failed to deploy function: $FUNC"
-    print_status "Trying with --debug flag..."
-    supabase functions deploy "$FUNC" --project-ref "$TARGET_PROJECT" --debug
-    continue
-  fi
-  
-  print_success "Function $FUNC copied successfully."
+  supabase functions download "$FUNC" --project-ref "$SOURCE_PROJECT"
+  print_success "Function $FUNC downloaded successfully."
 done
 
 cd ..
-rm -rf "$WORKDIR"
-print_success "All functions copied from $SOURCE_PROJECT to $TARGET_PROJECT." 
+print_success "All functions downloaded from $SOURCE_PROJECT into $WORKDIR." 
