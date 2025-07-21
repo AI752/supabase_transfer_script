@@ -506,6 +506,43 @@ Enter DESTINATION database URL (postgresql://username:password@host:port/databas
 [SUCCESS] All done! Your Supabase database has been successfully copied.
 ```
 
+## Edge Function Migration (NEW)
+
+You can also copy all Supabase Edge Functions from one project to another using the new script:
+
+### For Linux/macOS
+
+```bash
+cd supabase_edge_function_copy
+./supabase_edge_function_copy.sh
+```
+
+- The script will prompt for the source and target project IDs (project refs).
+- It will download all edge functions from the source project and deploy them to the target project using the Supabase CLI.
+- Requirements: Supabase CLI installed and logged in.
+
+## How to Get Source and Destination Project Refs for Edge Functions
+
+To copy edge functions between Supabase projects, you need the **project ref** (ID) for both the source and destination projects. Here's how to find them:
+
+1. **From the Supabase Dashboard:**
+   - Go to your Supabase project dashboard.
+   - In the URL, you'll see a string like `https://app.supabase.com/project/<project-ref>/...`. The `<project-ref>` is your project ID (e.g., `abcdefghijklmnop`).
+   - Or, go to **Settings** → **General**. The **Project Reference** is shown at the top.
+
+2. **Using the Supabase CLI:**
+   - Run:
+     ```bash
+     supabase projects list
+     ```
+   - This will list all your projects and their refs (IDs).
+
+**Example:**
+- Source Project Ref: `abcdefghijklmnop`
+- Destination Project Ref: `zyxwvutsrqponmlk`
+
+You will be prompted to enter these refs when running the edge function copy script.
+
 ## Contributing
 
 Feel free to submit issues and enhancement requests!
